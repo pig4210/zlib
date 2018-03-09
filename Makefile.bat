@@ -20,9 +20,9 @@
     set LNK=link
 
 :compileflags
-    set CFLAGS= /c /MP /GS- /Qpar /GL /analyze- /W4 /Gy /Zc:wchar_t /Zi /Gm- /Ox /Zc:inline /fp:precise /D "WIN32" /D "NDEBUG" /D "_UNICODE" /D "UNICODE" /fp:except- /errorReport:none /GF /WX- /Zc:forScope /GR- /Gd /Oy /Oi /MT /EHsc /nologo /Fo"%GPATH%\\"
+    set CFLAGS= /c /MP /GS- /Qpar /GL /analyze- /W4 /Gy /Zc:wchar_t /Zi /Gm- /Ox /Zc:inline /fp:precise /D "WIN32" /D "NDEBUG" /D "_UNICODE" /D "UNICODE" /fp:except- /errorReport:none /GF /WX /Zc:forScope /GR- /Gd /Oy /Oi /MT /EHsc /nologo /Fo"%GPATH%\\"
 
-    set MyCFLAGS= /wd"4131" /wd"4244" /wd"4996" /wd"4245" /wd"4127" /wd"4267" /D "_LIB"
+    set MyCFLAGS= /wd"4131" /wd"4244" /wd"4996" /wd"4245" /wd"4127" /wd"4267" /D "_LIB" /D"ZLIB_WINAPI"
     if not "%1" == "" set MyCFLAGS=%MyCFLAGS% /D "_USING_V110_SDK71_"
 
 :arflags
