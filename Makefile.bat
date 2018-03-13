@@ -17,12 +17,12 @@
 
     set CC=cl
     set AR=lib
-    set LNK=link
 
 :compileflags
     set CFLAGS= /c /MP /GS- /Qpar /GL /analyze- /W4 /Gy /Zc:wchar_t /Zi /Gm- /Ox /Zc:inline /fp:precise /D "WIN32" /D "NDEBUG" /D "_UNICODE" /D "UNICODE" /fp:except- /errorReport:none /GF /WX /Zc:forScope /GR- /Gd /Oy /Oi /MT /EHsc /nologo /Fo"%GPATH%\\"
 
     set MyCFLAGS= /wd"4131" /wd"4244" /wd"4996" /wd"4245" /wd"4127" /wd"4267" /D "_LIB" /D"ZLIB_WINAPI"
+
     if not "%1" == "" set MyCFLAGS=%MyCFLAGS% /D "_USING_V110_SDK71_"
 
 :arflags
@@ -30,11 +30,12 @@
 
 :makeinclude
     set IncludePath=%MyPath%\\include
-
     if not "%1" == "" (
-        echo ==== ==== ==== ==== Prepare Include Folder and Files...
-        rd /S /Q "%IncludePath%"
-        mkdir "%IncludePath%"
+        echo ==== ==== ==== ==== Prepare include folder and files...
+
+        rd /S /Q "%IncludePath%" >nul
+        if exist "%IncludePath%" goto fail
+        mkdir "%IncludePath%" >nul
 
         copy "%VPATH%\\zconf.h" "%IncludePath%" >nul
         copy "%VPATH%\\zlib.h"  "%IncludePath%" >nul
@@ -43,19 +44,20 @@
     )
 
 :start
-    echo ==== ==== ==== ==== Start compiling %PLAT%...
+    echo ==== ==== ==== ==== Prepare dest folder(%PLAT%)...
+
+    rd /S /Q "%GPATH%" >nul
+    if exist "%GPATH%" goto fail
+    mkdir "%GPATH%" >nul
 
     echo ==== ==== ==== ==== Prepare environment(%PLAT%)...
+
     cd /d %VCPath%
     if "%1" == "" (
         call vcvarsall.bat amd64 >nul
     ) else (
         call vcvarsall.bat x86 >nul
     )
-
-    echo ==== ==== ==== ==== Prepare dest folder(%PLAT%)...
-    if not exist "%GPATH%" mkdir %GPATH%
-    del /q "%GPATH%\\*.*"
 
     cd /d %VPATH%
 
@@ -68,11 +70,10 @@
     %AR% %ARFLAGS% /OUT:"%GPATH%\\zlib.lib" "%GPATH%\\*.obj" >nul
     if not %errorlevel%==0 goto link_error
 
-    del "%GPATH%\\*.obj"
+    del "%GPATH%\\*.obj" >nul
 
 :done
     echo.
-
     endlocal
 
     if "%1" == "" (
@@ -82,7 +83,6 @@
     )
 
     echo done.
-
     goto end
 
 :compile_error
@@ -91,6 +91,10 @@
 
 :link_error
     echo !!!!!!!!Link error!!!!!!!!
+    goto end
+
+:fail
+    echo !!!!!!!!Fail!!!!!!!!
     goto end
 
 :end
