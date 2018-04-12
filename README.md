@@ -2,12 +2,19 @@
 
 这里提供的[Makefile.bat](./Makefile.bat)，使用VS2017命令行编译项目
 
-如需要使用其它VS编译其它版本，请修改如下配置：
+如需使用其它VS，请修改如下配置：
 
     set VCPATH=C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build
-    set VPATH=%MyPath%\\xxx-x.x.x
+
+源代码目录自动定位，如需指定其它源代码目录，请修改如下代码的VPATH：
+
+    for /d %%P in ("%MyPath%\\%ProjectName%*") do set VPATH=%%~fP
 
 由于各方面考虑，不采用官方提供的方法编译
+
+在已有VC命令行环境下运行脚本，只编译当前平台相符的库，并且输出编译信息
+
+无VC命令行环境时，脚本静默编译x64 & x86
 
 ---- ---- ---- ----
 
