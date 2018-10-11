@@ -1,51 +1,35 @@
 ﻿# 这个 Makefile 用于使用 GNU make 在 Windows 编译 zlib 静态库
 # http://www.zlib.net/
 
-ifeq "$(filter x64 x86,$(Platform))" ""
-$(error Need VS Environment)
+# 如果只是单纯的 clean ，则无需 环境 和 路径
+ifneq "$(MAKECMDGOALS)" "clean"
+
+  # inc 的情况，无需环境
+  ifeq "$(MAKECMDGOALS)" "inc"
+  else ifeq "$(MAKECMDGOALS)" "clean inc"
+  else ifeq "$(MAKECMDGOALS)" "inc clean"
+  	$(error Are you kidding me ?!)
+  else
+    ifeq "$(filter x64 x86,$(Platform))" ""
+      $(error Need VS Environment)
+    endif
+  endif
+
+  ifeq "$(SRCPATH)" ""
+    $(error Need SRCPATH)
+  endif
+
 endif
 
-ifeq "$(VPATH)" ""
-$(error Need VPATH)
-endif
-
-CC 			:= cl.exe
-AR			:= lib.exe
-
-GPATH		:= $(Platform)
-
-######## CFLAGS
-CFLAGS		:= /c /MP /GS- /Qpar /GL /analyze- /W4 /Gy /Zc:wchar_t /Zi /Gm- /Ox /Zc:inline /fp:precise /D WIN32 /D NDEBUG /D _UNICODE /D UNICODE /fp:except- /errorReport:none /GF /WX /Zc:forScope /GR- /Gd /Oy /Oi /MT /EHsc /nologo
-CFLAGS		:= $(CFLAGS) /D _LIB /D ZLIB_WINAPI
-CFLAGS		:= $(CFLAGS) /I"$(VPATH)"
-CFLAGS		:= $(CFLAGS) /Fd"$(GPATH)/zlib.pdb"
-CFLAGS		:= $(CFLAGS) /wd4131 /wd4244 /wd4996 /wd4245 /wd4127 /wd4267 
-
-ifeq "$(Platform)" "x86"
-CFLAGS		:= $(CFLAGS) /D _USING_V110_SDK71_
-endif
-
-######## ARFLAGS
-ARFLAGS		:= /LTCG /ERRORREPORT:NONE /NOLOGO /MACHINE:$(Platform) /LIBPATH:"$(GPATH)"
 
 .PHONY : all
-all : ./include/zlib.h ./include/zconf.h $(GPATH) zlib.lib
+all : lib inc
 	@echo make done.
 
-./include/%.h : $(VPATH)\\%.h
-	@for %%F in ("$@") do @if not exist "%%~dpF" @mkdir "%%~dpF"
-	copy "$?" "$@"
-
-$(GPATH) :
-	@if not exist "$@" @mkdir "$@"
-
-TOP			:= $(VPATH)
-
-vpath %.obj $(GPATH)
-vpath %.lib $(GPATH)
+	
+TOP			:= $(SRCPATH)
 
 ######## 以下参考 win32/Makefile.msc ########
-
 OBJS = adler32.obj compress.obj crc32.obj deflate.obj gzclose.obj gzlib.obj gzread.obj \
        gzwrite.obj infback.obj inflate.obj inftrees.obj inffast.obj trees.obj uncompr.obj zutil.obj
 
@@ -81,11 +65,64 @@ trees.obj: $(TOP)/trees.c $(TOP)/zutil.h $(TOP)/zlib.h $(TOP)/zconf.h $(TOP)/def
 uncompr.obj: $(TOP)/uncompr.c $(TOP)/zlib.h $(TOP)/zconf.h
 
 zutil.obj: $(TOP)/zutil.c $(TOP)/zutil.h $(TOP)/zlib.h $(TOP)/zconf.h
-
 ################################################
 
-%.obj : $(VPATH)/%.c
-	$(CC) $(CFLAGS) "$<" -Fo"$(GPATH)/$@"
 
-zlib.lib : $(OBJS)
-	$(AR) $(ARFLAGS) /OUT:"$(GPATH)/$@" $(OBJS)
+DESTPATH	:= $(Platform)
+
+CC 			:= cl.exe
+AR			:= lib.exe
+
+######## CFLAGS
+CFLAGS		:= /c /MP /GS- /Qpar /GL /analyze- /W4 /Gy /Zc:wchar_t /Zi /Gm- /Ox /Zc:inline /fp:precise /D WIN32 /D NDEBUG /D _UNICODE /D UNICODE /fp:except- /errorReport:none /GF /WX /Zc:forScope /GR- /Gd /Oy /Oi /MT /EHsc /nologo
+CFLAGS		:= $(CFLAGS) /D _LIB /D ZLIB_WINAPI
+CFLAGS		:= $(CFLAGS) /I"$(SRCPATH)"
+CFLAGS		:= $(CFLAGS) /Fd"$(DESTPATH)/zlib.pdb"
+CFLAGS		:= $(CFLAGS) /wd4131 /wd4244 /wd4996 /wd4245 /wd4127 /wd4267 
+
+ifeq "$(Platform)" "x86"
+CFLAGS		:= $(CFLAGS) /D _USING_V110_SDK71_
+endif
+
+######## ARFLAGS
+ARFLAGS		:= /LTCG /ERRORREPORT:NONE /NOLOGO /MACHINE:$(Platform) /LIBPATH:"$(DESTPATH)"
+
+
+######## LIB
+vpath %.c $(SRCPATH)
+vpath %.h $(SRCPATH)
+
+vpath %.obj $(DESTPATH)
+
+.PHONY : lib
+lib : $(DESTPATH)/zlib.lib
+
+$(DESTPATH) :
+	@mkdir "$@"
+
+%.obj : %.c | $(DESTPATH)
+	$(CC) $(CFLAGS) "$<" -Fo"$(DESTPATH)/$(@F)"
+
+$(DESTPATH)/zlib.lib : $(OBJS)
+	$(AR) $(ARFLAGS) /OUT:"$@" $?
+	
+
+######## INC
+INCPATH		:= ./include
+
+.PHONY : inc
+inc : $(INCPATH)/zlib.h $(INCPATH)/zconf.h
+
+$(INCPATH) :
+	@mkdir "$@"
+
+$(INCPATH)/%.h : $(SRCPATH)\\%.h | $(INCPATH)
+	copy /y "$(?D)\\$(?F)" "$(@D)\\$(@F)"
+
+
+######## CLEAN
+.PHONY : clean
+clean :
+	@if exist "x64" @rd /s /q "x64"
+	@if exist "x86" @rd /s /q "x86"
+	@if exist "include" @rd /s /q "include"
