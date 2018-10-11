@@ -74,18 +74,18 @@ CC 			:= cl.exe
 AR			:= lib.exe
 
 ######## CFLAGS
-CFLAGS		:= /c /MP /GS- /Qpar /GL /analyze- /W4 /Gy /Zc:wchar_t /Zi /Gm- /Ox /Zc:inline /fp:precise /D WIN32 /D NDEBUG /D _UNICODE /D UNICODE /fp:except- /errorReport:none /GF /WX /Zc:forScope /GR- /Gd /Oy /Oi /MT /EHsc /nologo
-CFLAGS		:= $(CFLAGS) /D _LIB /D ZLIB_WINAPI
-CFLAGS		:= $(CFLAGS) /I"$(SRCPATH)"
-CFLAGS		:= $(CFLAGS) /Fd"$(DESTPATH)/zlib.pdb"
-CFLAGS		:= $(CFLAGS) /wd4131 /wd4244 /wd4996 /wd4245 /wd4127 /wd4267 
+CFLAGS		= /c /MP /GS- /Qpar /GL /analyze- /W4 /Gy /Zc:wchar_t /Zi /Gm- /Ox /Zc:inline /fp:precise /D WIN32 /D NDEBUG /D _UNICODE /D UNICODE /fp:except- /errorReport:none /GF /WX /Zc:forScope /GR- /Gd /Oy /Oi /MT /EHsc /nologo
+CFLAGS		+= /D _LIB /D ZLIB_WINAPI
+CFLAGS		+= /I"$(SRCPATH)"
+CFLAGS		+= /Fd"$(DESTPATH)/zlib.pdb"
+CFLAGS		+= /wd4131 /wd4244 /wd4996 /wd4245 /wd4127 /wd4267 
 
 ifeq "$(Platform)" "x86"
-CFLAGS		:= $(CFLAGS) /D _USING_V110_SDK71_
+CFLAGS		+= /D _USING_V110_SDK71_
 endif
 
 ######## ARFLAGS
-ARFLAGS		:= /LTCG /ERRORREPORT:NONE /NOLOGO /MACHINE:$(Platform) /LIBPATH:"$(DESTPATH)"
+ARFLAGS		= /LTCG /ERRORREPORT:NONE /NOLOGO /MACHINE:$(Platform) /LIBPATH:"$(DESTPATH)"
 
 
 ######## LIB
@@ -104,7 +104,7 @@ $(DESTPATH) :
 	$(CC) $(CFLAGS) "$<" -Fo"$(DESTPATH)/$(@F)"
 
 $(DESTPATH)/zlib.lib : $(OBJS)
-	$(AR) $(ARFLAGS) /OUT:"$@" $?
+	$(AR) $(ARFLAGS) /OUT:"$@" $^
 	
 
 ######## INC
