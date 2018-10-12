@@ -74,14 +74,14 @@ CC 			:= cl.exe
 AR			:= lib.exe
 
 ######## CFLAGS
-CFLAGS		= /c /MP /GS- /Qpar /GL /analyze- /W4 /Gy /Zc:wchar_t /Zi /Gm- /Ox /Zc:inline /fp:precise /D WIN32 /D NDEBUG /D _UNICODE /D UNICODE /fp:except- /errorReport:none /GF /WX /Zc:forScope /GR- /Gd /Oy /Oi /MT /EHsc /nologo
-CFLAGS		+= /D _LIB /D ZLIB_WINAPI
+CFLAGS		= /c /MP /GS- /Qpar /GL /analyze- /W4 /Gy /Zc:wchar_t /Zi /Gm- /Ox /Zc:inline /fp:precise /DWIN32 /DNDEBUG /D_UNICODE /DUNICODE /fp:except- /errorReport:none /GF /WX /Zc:forScope /GR- /Gd /Oy /Oi /MT /EHsc /nologo
+CFLAGS		+= /D_LIB /DZLIB_WINAPI
 CFLAGS		+= /I"$(SRCPATH)"
 CFLAGS		+= /Fd"$(DESTPATH)/zlib.pdb"
 CFLAGS		+= /wd4131 /wd4244 /wd4996 /wd4245 /wd4127 /wd4267 
 
 ifeq "$(Platform)" "x86"
-CFLAGS		+= /D _USING_V110_SDK71_
+CFLAGS		+= /D_USING_V110_SDK71_
 endif
 
 ######## ARFLAGS
@@ -123,6 +123,6 @@ $(INCPATH)/%.h : $(SRCPATH)\\%.h | $(INCPATH)
 ######## CLEAN
 .PHONY : clean
 clean :
-	@if exist "x64" @rd /s /q "x64"
-	@if exist "x86" @rd /s /q "x86"
-	@if exist "include" @rd /s /q "include"
+	@if exist x64 @rd /s /q x64
+	@if exist x86 @rd /s /q x86
+	@if exist include @rd /s /q include

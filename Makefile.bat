@@ -119,7 +119,7 @@
         echo %MAKE% SrcPath=%SrcPath% %1
         echo.
     )
-    %MAKE% SRCPATH=%SrcPath% %1 %SUF% && exit /B 0
+    %MAKE% SRCPATH="%SrcPath%" %1 %SUF% && exit /B 0
     
     echo !!!!!!!! Make Error !!!!!!!!
     exit /B 1
