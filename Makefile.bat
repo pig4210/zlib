@@ -5,7 +5,7 @@
     pushd "%~dp0"
     
 ::baseconfig
-    set VCPath=C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build
+    set VCPath=D:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build
     set MyPath=%CD%
     set MAKE=%MyPath%/../gnu/make/make.exe
 
@@ -91,7 +91,7 @@
         
         cd /d "%VCPath%"
         if "%PLAT%"=="x64" (
-            call vcvarsall.bat amd64 >nul
+            call vcvarsall.bat x64 >nul
         ) else (
             call vcvarsall.bat x86 >nul
         )
